@@ -52,49 +52,20 @@ class CategoryController extends BaseController
 
     public function show($id, Request $request, CategoryCriteria $criteria)
     {
-        // dump(\Cache::get('foobar'));
-        // return response(\Cache::get('foobar'))->header('Content-Type', 'application/json');
-        // dd(\Cache::get('category'));
-        // return \Cache::get('category');
         $category = $criteria
             ->channel($request->channel)
             ->include($request->includes)
             ->id($id)
             ->first();
 
-        // $cacheTags = $this->cacheTagger->for($category)->getTags();
-
-        // $cached = \Cache::tags($cacheTags)->get('category');
-
-        // if ($cached) {
-        //     return $cached;
-        // }
-
         if (! $category) {
             return $this->errorNotFound();
         }
-        // try {
-        //     $category = $categories->with(
-        //         explode(',', $request->includes)
-        //     )->getByHashedId($id);
-        // } catch (ModelNotFoundException $e) {
-        //     return $this->errorNotFound();
-        // }
 
         $resource = new CategoryResource($category);
         $resource->only($this->parseIncludedFields($request));
-            // dd($resource->response()->getContent());
-        // \Cache::tags($cacheTags)->remember('category', 60, function () use ($resource) {
-        //     return $resource->response()->getContent();
-        // });
 
-        // tags($cacheTags)->
-        // \Cache::remember('foobar', 60, function () use ($resource) {
-        //     return $resource->response()->getContent();
-        // });
-
-        return $resource;
-        // return $this->respondWithItem($category, new CategoryTransformer);
+        return $this->responseCache->handle($resource, $request);
     }
 
     public function getNested()

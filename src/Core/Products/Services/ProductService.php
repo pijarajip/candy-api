@@ -306,7 +306,6 @@ class ProductService extends BaseService
             'assets.transforms',
             'variants.product',
             'variants.tiers',
-            'variants.tiers.group',
             'variants.customerPricing',
             'primaryAsset',
             'primaryAsset.transforms.transform',
