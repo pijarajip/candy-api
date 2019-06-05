@@ -58,7 +58,7 @@ class ProductController extends BaseController
         }
         $resource = new ProductResource($product);
 
-        return $resource->only($request->fields);
+        return $this->responseCache->handle($resource, $request);
     }
 
     public function recommended(Request $request, ProductCriteria $productCriteria, BasketCriteriaInterface $baskets)
