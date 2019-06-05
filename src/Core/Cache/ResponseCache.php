@@ -6,6 +6,7 @@ use Log;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Cache\CacheManager;
+use GetCandy\Api\Core\CandyApi;
 
 class ResponseCache
 {
@@ -41,8 +42,16 @@ class ResponseCache
      */
     protected $config;
 
-    public function __construct(CacheTagger $tagger, CacheManager $cache)
+    /**
+     * The API manager instance
+     *
+     * @var CandyApi
+     */
+    protected $api;
+
+    public function __construct(CacheTagger $tagger, CacheManager $cache, CandyApi $api)
     {
+        $this->api = $api;
         $this->tagger = $tagger;
         $this->config = config('getcandy.endpoints.cache', []);
         $this->cacheType = $this->config['driver'] ?? 'default';
@@ -54,24 +63,55 @@ class ResponseCache
         $this->cache = $cache->driver($this->cacheType);
     }
 
+    /**
+     * Handle the response caching of a resource and request
+     *
+     * @param JsonResource $resource
+     * @param Request $request
+     * @return json
+     */
     public function handle(JsonResource $resource, Request $request)
     {
-        /**
-         * If the cache store can't support tags, just return the resource
-         */
-        if (in_array($this->cacheType, $this->exceptConnections)) {
-            Log::error("Cache store [{$this->cacheType}] not supported for endpoint caching");
+        // If it's a hub request, just bail straight away
+        if ($this->api->isHubRequest()) {
             return $resource;
         }
 
-        $cacheKey = $this->getCacheKey($request);
+        /**
+         * If the cache store can't support tags, just return the resource
+         */
+        $invalid = in_array($this->cacheType, $this->exceptConnections);
+        if ((!$this->config['enabled'] ?? false) || $invalid) {
+            if ($invalid) {
+                Log::error("Cache store [{$this->cacheType}] not supported for endpoint caching");
+            }
+            return $resource;
+        }
+
         $tags = $this->tagger->for($resource->resource)->getTags();
 
-        return $this->cache->tags($tags)->remember($cacheKey, 60, function () use ($resource) {
-            return $resource->response()->getContent();
-        });
+        $response = $this->cache->tags($tags->toArray())->remember(
+            $this->getCacheKey($request),
+            ($this->config['lifetime'] ?? 86400),
+            function () use ($resource) {
+                return $resource->response()->getContent();
+            }
+        );
+
+        return response($response)->header('Content-Type', 'application/json');
     }
 
+    public function flush($tags)
+    {
+        return $this->cache->tags($tags)->flush();
+    }
+
+    /**
+     * Gets the cache key via the request
+     *
+     * @param Request $request
+     * @return string
+     */
     protected function getCacheKey($request)
     {
         return md5($request->getRequestUri());

@@ -33,8 +33,7 @@ class RouteController extends BaseController
         } catch (ModelNotFoundException $e) {
             return $this->errorNotFound();
         }
-
-        return new RouteResource($route);
+        return $this->responseCache->handle(new RouteResource($route), $request);
     }
 
     /**

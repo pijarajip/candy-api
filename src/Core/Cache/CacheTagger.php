@@ -81,9 +81,9 @@ class CacheTagger
      * @param Model $model
      * @return void
      */
-    protected function setTags(Model $model)
+    protected function setTags(Model $model = null)
     {
-        if (!in_array($this->getTagPrefix($model), $this->except)) {
+        if ($model && !in_array($this->getTagPrefix($model), $this->except)) {
             $this->tags[] = $this->getTagKey($model);
             foreach ($model->getRelations() as $relation) {
                 if (is_iterable($relation)) {

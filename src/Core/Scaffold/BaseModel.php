@@ -5,14 +5,50 @@ namespace GetCandy\Api\Core\Scaffold;
 use GetCandy\Api\Core\Traits\Hashids;
 use Illuminate\Database\Eloquent\Model;
 use GetCandy\Api\Core\Routes\Models\Route;
+use Illuminate\Database\Eloquent\Concerns\HasEvents;
+use GetCandy\Api\Core\Cache\CacheTagger;
+use GetCandy\Api\Core\Cache\ResponseCache;
 
 abstract class BaseModel extends Model
 {
-    use Hashids;
+    use Hashids, HasEvents;
 
     protected $hashids = 'main';
 
     public $custom_attributes = [];
+
+    /**
+     * Fire the given event for the model.
+     *
+     * @param  string  $event
+     * @param  bool  $halt
+     * @return mixed
+     */
+    protected function fireModelEvent($event, $halt = true)
+    {
+        if (! isset(static::$dispatcher)) {
+            return true;
+        }
+
+        if ($event == 'saved') {
+            $cacheTag = app()->make(CacheTagger::class)->getTagKey($this);
+            app()->make(ResponseCache::class)->flush($cacheTag);
+        }
+
+        // First, we will get the proper method to call on the event dispatcher, and then we
+        // will attempt to fire a custom, object based event for the given event. If that
+        // returns a result we can return that result, or we'll call the string events.
+        $method = $halt ? 'until' : 'fire';
+        $result = $this->filterModelEventResults(
+            $this->fireCustomModelEvent($event, $method)
+        );
+        if ($result === false) {
+            return false;
+        }
+        return ! empty($result) ? $result : static::$dispatcher->{$method}(
+            "eloquent.{$event}: ".static::class, $this
+        );
+    }
 
     public function getSettingsAttribute()
     {
