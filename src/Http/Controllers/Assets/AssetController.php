@@ -9,9 +9,9 @@ use Illuminate\Http\Request;
 use GetCandy\Exceptions\InvalidServiceException;
 use GetCandy\Api\Http\Controllers\BaseController;
 use GetCandy\Api\Http\Requests\Assets\UploadRequest;
+use GetCandy\Api\Http\Resources\Assets\AssetResource;
 use GetCandy\Api\Http\Requests\Assets\UpdateAllRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use GetCandy\Api\Http\Transformers\Fractal\Assets\AssetTransformer;
 
 class AssetController extends BaseController
 {
@@ -72,7 +72,7 @@ class AssetController extends BaseController
             return $this->respondWithError('Unable to upload asset');
         }
 
-        return $this->respondWithItem($asset, new AssetTransformer);
+        return new AssetResource($asset);
     }
 
     public function destroy($id)

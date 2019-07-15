@@ -4,7 +4,7 @@ namespace GetCandy\Api\Http\Controllers\Associations;
 
 use Illuminate\Http\Request;
 use GetCandy\Api\Http\Controllers\BaseController;
-use GetCandy\Api\Http\Transformers\Fractal\Associations\AssociationGroupTransformer;
+use GetCandy\Api\Http\Resources\Associations\AssociationGroupCollection;
 
 class AssociationGroupController extends BaseController
 {
@@ -15,7 +15,6 @@ class AssociationGroupController extends BaseController
     public function index(Request $request)
     {
         $groups = app('api')->associationGroups()->getPaginatedData();
-
-        return $this->respondWithCollection($groups, new AssociationGroupTransformer);
+        return new AssociationGroupCollection($groups, $this->parseIncludedFields($request));
     }
 }
