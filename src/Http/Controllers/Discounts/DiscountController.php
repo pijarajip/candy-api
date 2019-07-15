@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use GetCandy\Api\Http\Controllers\BaseController;
 use GetCandy\Api\Http\Requests\Discounts\UpdateRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use GetCandy\Api\Http\Transformers\Fractal\Discounts\DiscountTransformer;
+use GetCandy\Api\Http\Resources\Discounts\DiscountResource;
+use GetCandy\Api\Http\Resources\Discounts\DiscountCollection;
 
 class DiscountController extends BaseController
 {
@@ -16,8 +17,7 @@ class DiscountController extends BaseController
             $request->per_page,
             $request->current_page
         );
-
-        return $this->respondWithCollection($paginator, new DiscountTransformer);
+        return new DiscountCollection($paginator);
     }
 
     public function store(Request $request)
@@ -28,8 +28,7 @@ class DiscountController extends BaseController
     public function update($id, UpdateRequest $request)
     {
         $discount = app('api')->discounts()->update($id, $request->all());
-
-        return $this->respondWithItem($discount, new DiscountTransformer);
+        return new DiscountResource($discount);
     }
 
     /**
@@ -46,7 +45,6 @@ class DiscountController extends BaseController
         } catch (ModelNotFoundException $e) {
             return $this->errorNotFound();
         }
-
-        return $this->respondWithItem($discount, new DiscountTransformer);
+        return new DiscountResource($discount);
     }
 }

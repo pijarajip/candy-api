@@ -3,25 +3,18 @@
 namespace GetCandy\Api\Core\Traits;
 
 use Illuminate\Http\Response;
-use League\Fractal\Resource\Item;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 
-/**
- * @deprecated 0.9.0
- */
-trait Fractal
+trait ApiResponses
 {
     protected $fractal;
     protected $statusCode = 200;
 
-    protected function parseIncludes($includes = [])
+    protected function parseIncludes($includes = null)
     {
-        if ($includes) {
-            app()->fractal->parseIncludes($includes);
+        if (! $includes) {
+            return [];
         }
-
-        return $this;
+        return explode(',', $includes);
     }
 
     /**
@@ -152,66 +145,6 @@ trait Fractal
                 'message' => $message,
             ],
         ]);
-    }
-
-    /**
-     * Respond with an item.
-     * @param  array $item
-     * @param  object $callback The transformer to use
-     * @return array
-     */
-    protected function respondWithItem($item, $callback, $meta = [])
-    {
-        if (app('request')->includes) {
-            $this->parseIncludes(app('request')->includes);
-        }
-
-        $resource = new Item($item, $callback);
-
-        $meta = array_merge([
-            'lang' => app()->getLocale(),
-        ], $meta);
-
-        $resource->setMeta($meta);
-
-        $rootScope = app()->fractal->createData($resource);
-
-        return $this->respondWithArray($rootScope->toArray());
-    }
-
-    /**
-     * Respond with a collection.
-     * @param  array $paginator
-     * @param  object $callback The transformer to use
-     * @return array
-     */
-    protected function respondWithCollection($paginator, $callback, $meta = [])
-    {
-        if (app('request')->includes) {
-            $this->parseIncludes(app('request')->includes);
-        }
-
-        if ($paginator instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            $collection = $paginator->getCollection();
-        } else {
-            $collection = $paginator;
-        }
-
-        $resource = new Collection($collection, $callback);
-
-        $meta = array_merge([
-            'lang' => app()->getLocale(),
-        ], $meta);
-
-        $resource->setMeta($meta);
-
-        if ($paginator instanceof \Illuminate\Pagination\LengthAwarePaginator) {
-            $resource->setPaginator(new IlluminatePaginatorAdapter($paginator));
-        }
-
-        $rootScope = app()->fractal->createData($resource);
-
-        return $this->respondWithArray($rootScope->toArray());
     }
 
     /**

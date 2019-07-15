@@ -4,8 +4,8 @@ namespace GetCandy\Api\Http\Controllers\Customers;
 
 use Illuminate\Http\Request;
 use GetCandy\Api\Http\Controllers\BaseController;
+use GetCandy\Api\Http\Requests\Users\UserResource;
 use GetCandy\Api\Http\Requests\Customers\CreateRequest;
-use GetCandy\Api\Http\Transformers\Fractal\Users\UserTransformer;
 
 class CustomerController extends BaseController
 {
@@ -28,8 +28,7 @@ class CustomerController extends BaseController
     public function show($id, Request $request)
     {
         $customer = app('api')->customers()->getByHashedId($id);
-
-        return $this->respondWithItem($customer, new UserTransformer);
+        return new UserResource($customer);
     }
 
     /**
@@ -43,6 +42,6 @@ class CustomerController extends BaseController
     {
         $customer = app('api')->customers()->register($request->all());
 
-        return $this->respondWithItem($customer, new UserTransformer);
+        return new UserResource($customer);
     }
 }
