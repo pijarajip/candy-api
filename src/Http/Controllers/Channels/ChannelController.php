@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use GetCandy\Api\Http\Resources\Channels\ChannelResource;
 use GetCandy\Api\Http\Resources\Channels\ChannelCollection;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use GetCandy\Api\Http\Transformers\Fractal\Channels\ChannelTransformer;
 
 class ChannelController extends BaseController
 {
