@@ -6,9 +6,10 @@ use Illuminate\Http\Request;
 use GetCandy\Api\Http\Controllers\BaseController;
 use GetCandy\Api\Http\Requests\Shipping\CreateRequest;
 use GetCandy\Api\Http\Requests\Shipping\UpdateRequest;
+use GetCandy\Api\Http\Shipping\ShippingMethodResource;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use GetCandy\Api\Http\Shipping\ShippingMethodCollection;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use GetCandy\Api\Http\Transformers\Fractal\Shipping\ShippingMethodTransformer;
 
 class ShippingMethodController extends BaseController
 {
@@ -18,9 +19,8 @@ class ShippingMethodController extends BaseController
      */
     public function index(Request $request)
     {
-        $orders = app('api')->shippingMethods()->getPaginatedData($request->per_page, $request->current_page);
-
-        return $this->respondWithCollection($orders, new ShippingMethodTransformer);
+        $methods = app('api')->shippingMethods()->getPaginatedData($request->per_page, $request->current_page);
+        return new ShippingMethodCollection($methods);
     }
 
     /**
@@ -31,12 +31,11 @@ class ShippingMethodController extends BaseController
     public function show($id)
     {
         try {
-            $shipping = app('api')->shippingMethods()->getByHashedId($id);
+            $method = app('api')->shippingMethods()->getByHashedId($id);
         } catch (ModelNotFoundException $e) {
             return $this->errorNotFound();
         }
-
-        return $this->respondWithItem($shipping, new ShippingMethodTransformer);
+        return new ShippingMethodResource($method);
     }
 
     /**
@@ -47,8 +46,7 @@ class ShippingMethodController extends BaseController
     public function store(CreateRequest $request)
     {
         $result = app('api')->shippingMethods()->create($request->all());
-
-        return $this->respondWithItem($result, new ShippingMethodTransformer);
+        return new ShippingMethodResource($result);
     }
 
     public function update($id, UpdateRequest $request)
@@ -58,15 +56,13 @@ class ShippingMethodController extends BaseController
         } catch (NotFoundHttpException $e) {
             return $this->errorNotFound();
         }
-
-        return $this->respondWithItem($result, new ShippingMethodTransformer);
+        return new ShippingMethodResource($result);
     }
 
     public function updateZones($id, Request $request)
     {
         $method = app('api')->shippingMethods()->updateZones($id, $request->all());
-
-        return $this->respondWithItem($method, new ShippingMethodTransformer);
+        return new ShippingMethodResource($method);
     }
 
     public function updateUsers($id, Request $request)

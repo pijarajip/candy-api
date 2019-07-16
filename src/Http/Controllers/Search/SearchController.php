@@ -9,7 +9,7 @@ use GetCandy\Api\Http\Requests\Search\SearchRequest;
 use GetCandy\Api\Core\Channels\Services\ChannelService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use GetCandy\Api\Core\Categories\Services\CategoryService;
-use GetCandy\Api\Http\Transformers\Fractal\Search\SearchSuggestionTransformer;
+use GetCandy\Api\Http\Resources\Search\SearchSuggestionCollection;
 
 class SearchController extends BaseController
 {
@@ -116,7 +116,7 @@ class SearchController extends BaseController
 
         $results = app('api')->search()->getSuggestResults($results, $request->type);
 
-        return $this->respondWithCollection($results, new SearchSuggestionTransformer);
+        return SearchSuggestionCollection($results);
     }
 
     /**

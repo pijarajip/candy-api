@@ -2,10 +2,9 @@
 
 namespace GetCandy\Api\Http\Controllers\Settings;
 
-use Illuminate\Http\Request;
+use GetCandy\Api\Http\Settings\SettingResource;
 use GetCandy\Api\Http\Controllers\BaseController;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use GetCandy\Api\Http\Transformers\Fractal\Settings\SettingTransformer;
 
 class SettingController extends BaseController
 {
@@ -26,6 +25,6 @@ class SettingController extends BaseController
             return $this->errorNotFound();
         }
 
-        return $this->respondWithItem($setting, new SettingTransformer);
+        return new SettingResource($setting);
     }
 }
