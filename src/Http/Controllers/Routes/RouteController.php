@@ -7,7 +7,6 @@ use GetCandy\Api\Core\Routes\RouteCriteria;
 use GetCandy\Api\Http\Controllers\BaseController;
 use GetCandy\Api\Http\Requests\Routes\UpdateRequest;
 use GetCandy\Api\Http\Resources\Routes\RouteResource;
-use GetCandy\Api\Http\Resources\Routes\RouteResource;
 use GetCandy\Api\Http\Resources\Routes\RouteCollection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use GetCandy\Api\Exceptions\MinimumRecordRequiredException;

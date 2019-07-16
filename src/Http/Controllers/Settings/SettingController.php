@@ -2,9 +2,9 @@
 
 namespace GetCandy\Api\Http\Controllers\Settings;
 
-use GetCandy\Api\Http\Settings\SettingResource;
 use GetCandy\Api\Http\Controllers\BaseController;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use GetCandy\Api\Http\Resources\Settings\SettingResource;
 
 class SettingController extends BaseController
 {
