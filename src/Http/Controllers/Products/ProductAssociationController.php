@@ -5,7 +5,7 @@ namespace GetCandy\Api\Http\Controllers\Products;
 use GetCandy\Api\Http\Controllers\BaseController;
 use GetCandy\Api\Http\Requests\Products\Associations\CreateRequest;
 use GetCandy\Api\Http\Requests\Products\Associations\DeleteRequest;
-use GetCandy\Api\Http\Transformers\Fractal\Products\ProductAssociationTransformer;
+use GetCandy\Api\Http\Resources\Products\ProductAssociationCollection;
 
 class ProductAssociationController extends BaseController
 {
@@ -18,18 +18,18 @@ class ProductAssociationController extends BaseController
     public function store($product, CreateRequest $request)
     {
         $result = app('api')->productAssociations()->store($product, $request->all());
-
-        return $this->respondWithCollection($result, new ProductAssociationTransformer);
+        return new ProductAssociationCollection($result);
     }
 
     /**
      * Handles the request to remove a product association.
      * @param  string        $product
      * @param  DeleteRequest $request
-     * @return mixed
+     * @return Json
      */
     public function destroy($product, DeleteRequest $request)
     {
         $result = app('api')->productAssociations()->destroy($product, $request->associations);
+        return $this->respondWithNoContent();
     }
 }

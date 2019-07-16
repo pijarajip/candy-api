@@ -6,19 +6,19 @@ use Illuminate\Http\Request;
 use GetCandy\Api\Core\Routes\RouteCriteria;
 use GetCandy\Api\Http\Controllers\BaseController;
 use GetCandy\Api\Http\Requests\Routes\UpdateRequest;
+use GetCandy\Api\Http\Resources\Routes\RouteResource;
+use GetCandy\Api\Http\Resources\Routes\RouteResource;
+use GetCandy\Api\Http\Resources\Routes\RouteCollection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use GetCandy\Api\Exceptions\MinimumRecordRequiredException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use GetCandy\Api\Http\Transformers\Fractal\Routes\RouteTransformer;
-use GetCandy\Api\Http\Resources\Routes\RouteResource;
 
 class RouteController extends BaseController
 {
     public function index()
     {
-        $pages = app('api')->routes()->getPaginatedData();
-
-        return $this->respondWithCollection($pages, new RouteTransformer);
+        $routes = app('api')->routes()->getPaginatedData();
+        return new RouteCollection($routes);
     }
 
     /**
@@ -53,13 +53,14 @@ class RouteController extends BaseController
             return $this->errorNotFound();
         }
 
-        return $this->respondWithItem($route, new RouteTransformer);
+        return new RouteResource($route);
     }
 
     public function destroy($id)
     {
         try {
             $result = app('api')->routes()->delete($id);
+            return $this->respondWithNoContent();
         } catch (MinimumRecordRequiredException $e) {
             return $this->errorUnprocessable($e->getMessage());
         } catch (NotFoundHttpException $e) {

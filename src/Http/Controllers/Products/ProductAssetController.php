@@ -5,7 +5,7 @@ namespace GetCandy\Api\Http\Controllers\Products;
 use Illuminate\Http\Request;
 use GetCandy\Api\Http\Controllers\BaseController;
 use GetCandy\Api\Http\Requests\Assets\UploadRequest;
-use GetCandy\Api\Http\Transformers\Fractal\Assets\AssetTransformer;
+use GetCandy\Api\Http\Resources\Assets\AssetCollection;
 
 class ProductAssetController extends BaseController
 {
@@ -19,8 +19,7 @@ class ProductAssetController extends BaseController
     {
         $product = app('api')->products()->getByHashedId($id);
         $assets = app('api')->assets()->getAssets($product, $request->all());
-
-        return $this->respondWithCollection($assets, new AssetTransformer);
+        return new AssetCollection($assets);
     }
 
     /**
@@ -31,5 +30,6 @@ class ProductAssetController extends BaseController
      */
     public function upload($id, UploadRequest $request)
     {
+        // TODO: What's happening with this?
     }
 }

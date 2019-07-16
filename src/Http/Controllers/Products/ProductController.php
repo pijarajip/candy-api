@@ -3,6 +3,7 @@
 namespace GetCandy\Api\Http\Controllers\Products;
 
 use Illuminate\Http\Request;
+use GetCandy\Api\Core\Products\Models\Product;
 use GetCandy\Api\Core\Products\ProductCriteria;
 use GetCandy\Api\Http\Controllers\BaseController;
 use GetCandy\Exceptions\InvalidLanguageException;
@@ -12,15 +13,13 @@ use GetCandy\Api\Http\Requests\Products\UpdateRequest;
 use GetCandy\Exceptions\MinimumRecordRequiredException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use GetCandy\Api\Http\Requests\Products\DuplicateRequest;
-use GetCandy\Api\Http\Resources\Products\ProductResource;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use GetCandy\Api\Http\Resources\Products\ProductResource;
 use GetCandy\Api\Http\Resources\Products\ProductCollection;
 use GetCandy\Api\Core\Baskets\Interfaces\BasketCriteriaInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use GetCandy\Api\Http\Transformers\Fractal\Products\ProductTransformer;
-use GetCandy\Api\Http\Resources\Products\ProductRecommendationCollection;
 use GetCandy\Api\Core\Products\Factories\ProductDuplicateFactory;
-use GetCandy\Api\Core\Products\Models\Product;
+use GetCandy\Api\Http\Resources\Products\ProductRecommendationCollection;
 
 class ProductController extends BaseController
 {
@@ -94,7 +93,7 @@ class ProductController extends BaseController
             return $this->errorUnprocessable($e->getMessage());
         }
 
-        return $this->respondWithItem($result, new ProductTransformer);
+        return new ProductResource($result);
     }
 
     /**
@@ -116,8 +115,7 @@ class ProductController extends BaseController
         } catch (InvalidLanguageException $e) {
             return $this->errorUnprocessable($e->getMessage());
         }
-
-        return $this->respondWithItem($result, new ProductTransformer);
+        return new ProductResource($result);
     }
 
     public function duplicate($product, DuplicateRequest $request, ProductDuplicateFactory $factory)

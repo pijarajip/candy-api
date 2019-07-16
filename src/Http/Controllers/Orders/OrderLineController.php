@@ -3,11 +3,11 @@
 namespace GetCandy\Api\Http\Controllers\Orders;
 
 use GetCandy\Api\Http\Controllers\BaseController;
+use GetCandy\Api\Http\Resources\Orders\OrderResource;
 use GetCandy\Api\Core\Orders\Services\OrderLineService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use GetCandy\Api\Http\Requests\Orders\Lines\CreateRequest;
 use GetCandy\Api\Http\Requests\Orders\Lines\DeleteRequest;
-use GetCandy\Api\Http\Transformers\Fractal\Orders\OrderTransformer;
 
 class OrderLineController extends BaseController
 {
@@ -29,12 +29,11 @@ class OrderLineController extends BaseController
     public function store($orderId, CreateRequest $request)
     {
         try {
-            $result = $this->orderLines->store($orderId, $request->all(), $request->is_manual);
+            $order = $this->orderLines->store($orderId, $request->all(), $request->is_manual);
         } catch (ModelNotFoundException $e) {
             return $this->errorNotFound();
         }
-
-        return $this->respondWithItem($result, new OrderTransformer);
+        return new OrderResource($order);
     }
 
     /**

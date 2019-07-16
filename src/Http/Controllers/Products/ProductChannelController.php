@@ -30,6 +30,7 @@ class ProductChannelController extends BaseController
      */
     public function destroy($product, DeleteRequest $request)
     {
-        $result = app('api')->productAssociations()->destroy($product, $request->associations);
+        app('api')->productAssociations()->destroy($product, $request->associations);
+        return $this->respondWithNoContent();
     }
 }

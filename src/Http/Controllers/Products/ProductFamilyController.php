@@ -12,8 +12,8 @@ use GetCandy\Api\Http\Requests\ProductFamilies\DeleteRequest;
 use GetCandy\Api\Http\Requests\ProductFamilies\UpdateRequest;
 use GetCandy\Api\Core\Products\Criteria\ProductFamilyCriteria;
 use GetCandy\Api\Http\Resources\Products\ProductFamilyResource;
+use GetCandy\Api\Http\Resources\Products\ProductFamilyCollection;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use GetCandy\Api\Http\Transformers\Fractal\Products\ProductFamilyTransformer;
 
 class ProductFamilyController extends BaseController
 {
@@ -25,8 +25,7 @@ class ProductFamilyController extends BaseController
     public function index(Request $request)
     {
         $paginator = app('api')->productFamilies()->getPaginatedData($request->per_page);
-        // event(new ViewProductEvent(['hello' => 'there']));
-        return $this->respondWithCollection($paginator, new ProductFamilyTransformer);
+        return new ProductFamilyCollection($paginator);
     }
 
     /**
@@ -57,8 +56,7 @@ class ProductFamilyController extends BaseController
         } catch (InvalidLanguageException $e) {
             return $this->errorUnprocessable($e->getMessage());
         }
-
-        return $this->respondWithItem($result, new ProductFamilyTransformer);
+        return new ProductFamily($result);
     }
 
     /**
@@ -79,7 +77,7 @@ class ProductFamilyController extends BaseController
             return $this->errorUnprocessable($e->getMessage());
         }
 
-        return $this->respondWithItem($result, new ProductFamilyTransformer);
+        return new ProductFamilyResource($result);
     }
 
     /**
