@@ -40,7 +40,7 @@ class ProductService extends BaseService
     public function getByHashedId($id)
     {
         $id = $this->model->decodeId($id);
-        $product = $this->model->findOrFail($id);
+        $product = $this->model->withoutGlobalScopes()->findOrFail($id);
 
         return $this->factory->init($product)->get();
     }

@@ -22,7 +22,7 @@ class DiscountCriteriaItem extends BaseModel
         $relation = camel_case(str_plural($type));
 
         if (method_exists($this, $relation)) {
-            $realId = (new $type)->decodedId($id);
+            $realId = app('api')->{$relation}()->getDecodedId($id);
             $this->{$relation}()->attach($realId);
         }
     }

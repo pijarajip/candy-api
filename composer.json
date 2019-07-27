@@ -53,6 +53,9 @@
             "aliases": {
                 "GetCandy" : "Facades\\GetCandy\\Api\\Core\\Helpers\\GetCandy"
             }
+        },
+        "branch-alias": {
+            "dev-elfumy": "0.3.6"
         }
     }
 }

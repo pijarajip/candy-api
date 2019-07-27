@@ -9,8 +9,8 @@ class ShippingServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->app->bind(ShippingCalculator::class, function ($app) {
-            return $app->make(ShippingCalculator::class);
+        $this->app->singleton(ShippingCalculator::class, function ($app) {
+            return new ShippingCalculator($app);
         });
     }
 }
