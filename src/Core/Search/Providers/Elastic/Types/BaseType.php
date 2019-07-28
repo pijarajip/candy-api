@@ -44,7 +44,7 @@ abstract class BaseType
     {
         $attributes = $this->attributeMapping($model);
 
-        $customerGroups = app('api')->customerGroups->all();
+        $customerGroups = app('api')->customerGroups()->all();
 
         $indexables = collect();
 
